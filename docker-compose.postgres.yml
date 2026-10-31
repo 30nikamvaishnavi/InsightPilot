@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-insightpilot}
+      POSTGRES_USER: ${POSTGRES_USER:-insightpilot}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD for the local PostgreSQL service}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    volumes:
+      - insightpilot-postgres-data:/var/lib/postgresql/data
+  api:
+    environment:
+      DATABASE_URL: ${DATABASE_URL:-postgresql://${POSTGRES_USER:-insightpilot}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB:-insightpilot}}
+    depends_on:
+      postgres:
+        condition: service_healthy
+volumes:
+  insightpilot-postgres-data:

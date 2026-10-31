@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>InsightPilot</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      --bg: #f4f6fb; --surface: #fff; --text: #192334; --muted: #536176;
+      --line: #d7deea; --accent: #244fca; --accent-contrast: #fff;
+      --good: #17613c; --bad: #a32626; --user: #e7edff; --shadow: 0 8px 26px #1a2b4a12;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0e141d; --surface: #171f2b; --text: #edf2fb; --muted: #bdc7d6;
+        --line: #344154; --accent: #91aaff; --accent-contrast: #121b2b;
+        --good: #8be2ac; --bad: #ff9a9a; --user: #243554; --shadow: 0 8px 26px #0005;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, sans-serif; }
+    button, input, select { font: inherit; }
+    button, input, select, summary { min-height: 44px; }
+    button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible {
+      outline: 3px solid var(--accent); outline-offset: 3px;
+    }
+    .shell { max-width: 1080px; margin: auto; padding: 20px 16px 56px; }
+    header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
+    h1 { font-size: 1.55rem; margin: 0; letter-spacing: -.03em; }
+    .subtitle { margin: 4px 0 0; color: var(--muted); }
+    .status { margin: 18px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); }
+    .status.offline { border-color: var(--bad); color: var(--bad); }
+    nav { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; }
+    nav button, .secondary, .chip {
+      border: 1px solid var(--line); background: var(--surface); color: var(--text);
+      border-radius: 10px; padding: 8px 14px; cursor: pointer;
+    }
+    nav button[aria-current="page"] { background: var(--accent); color: var(--accent-contrast); border-color: var(--accent); }
+    .card { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 18px; box-shadow: var(--shadow); }
+    h2 { font-size: 1.2rem; margin: 0 0 14px; }
+    h3 { font-size: 1rem; margin: 18px 0 8px; }
+    .page[hidden] { display: none; }
+    .chat-list { display: grid; gap: 14px; max-height: 55vh; overflow-y: auto; padding: 4px 2px 14px; }
+    .bubble { max-width: min(90%, 760px); padding: 12px 14px; border-radius: 14px; white-space: pre-wrap; overflow-wrap: anywhere; }
+    .bubble.user { justify-self: end; background: var(--user); }
+    .bubble.assistant { justify-self: start; border: 1px solid var(--line); }
+    .bubble p { margin: 0; }
+    .verified { display: inline-block; margin-bottom: 8px; color: var(--good); font-weight: 700; }
+    .unverified { display: inline-block; margin-bottom: 8px; color: var(--bad); font-weight: 700; }
+    .composer { display: flex; gap: 10px; }
+    input[type="text"], input[type="file"] {
+      width: 100%; min-width: 0; padding: 10px 12px; color: var(--text);
+      background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+    }
+    .primary { flex: 0 0 auto; border: 0; border-radius: 10px; padding: 9px 18px; background: var(--accent); color: var(--accent-contrast); font-weight: 700; cursor: pointer; }
+    .primary:disabled { opacity: .65; cursor: wait; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip { min-height: 36px; border-radius: 999px; padding: 5px 11px; font-size: .9rem; }
+    details { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 8px; }
+    summary { cursor: pointer; font-weight: 650; }
+    pre, code { white-space: pre-wrap; overflow-wrap: anywhere; font: .85rem/1.5 ui-monospace, monospace; }
+    table { width: 100%; border-collapse: collapse; display: block; overflow-x: auto; font-size: .9rem; }
+    th, td { text-align: left; vertical-align: top; border-bottom: 1px solid var(--line); padding: 7px 9px; }
+    .muted { color: var(--muted); }
+    .form-stack { display: grid; gap: 12px; }
+    .metrics { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+    .metric { padding: 12px; border: 1px solid var(--line); border-radius: 10px; overflow-wrap: anywhere; }
+    .metric strong { display: block; font-size: 1.05rem; }
+    .trace-run { border: 1px solid var(--line); border-radius: 10px; padding: 12px; margin-top: 12px; }
+    .timeline { margin: 8px 0 0 8px; padding-left: 18px; border-left: 2px solid var(--line); }
+    .timeline li { padding: 4px 0 10px; }
+    .timeline li::marker { color: var(--accent); }
+    .error { color: var(--bad); }
+    @media (max-width: 520px) {
+      .shell { padding: 14px 12px 40px; }
+      header { display: block; }
+      .composer { align-items: stretch; }
+      .primary { padding-inline: 13px; }
+      .card { padding: 14px; }
+      .bubble { max-width: 96%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>InsightPilot</h1>
+        <p class="subtitle">A data analyst that computes with SQL and code, then verifies its answer.</p>
+      </div>
+    </header>
+    <div id="backend-status" class="status" role="status" aria-live="polite">Checking backend…</div>
+    <nav aria-label="Main navigation">
+      <button type="button" data-page="chat" aria-current="page">Chat</button>
+      <button type="button" data-page="data">Data</button>
+      <button type="button" data-page="evaluation">Evaluation</button>
+      <button type="button" data-page="traces">Traces</button>
+    </nav>
+
+    <section id="page-chat" class="page card" aria-labelledby="chat-title">
+      <h2 id="chat-title">Chat</h2>
+      <div id="chat-list" class="chat-list" aria-live="polite"></div>
+      <div id="typing" class="muted" role="status" hidden>InsightPilot is working…</div>
+      <form id="chat-form" class="composer">
+        <input id="question" type="text" autocomplete="off" maxlength="500" required
+          aria-label="Ask a question" placeholder="Ask about your data">
+        <button id="ask-button" class="primary" type="submit">Ask</button>
+      </form>
+      <div id="examples" class="chips" aria-label="Example questions"></div>
+    </section>
+
+    <section id="page-data" class="page card" aria-labelledby="data-title" hidden>
+      <h2 id="data-title">Data</h2>
+      <p class="muted">Upload a CSV, JSON, or Excel file to add a table and inspect its validation profile.</p>
+      <form id="upload-form" class="form-stack">
+        <label for="upload-file">Choose a data file</label>
+        <input id="upload-file" type="file" accept=".csv,.json,.jsonl,.xlsx,.tsv" required>
+        <button id="upload-button" class="primary" type="submit">Upload and profile</button>
+      </form>
+      <p id="upload-message" class="muted" aria-live="polite"></p>
+      <div id="data-profile"></div>
+      <div id="data-schema"></div>
+    </section>
+
+    <section id="page-evaluation" class="page card" aria-labelledby="evaluation-title" hidden>
+      <h2 id="evaluation-title">Evaluation</h2>
+      <div id="evaluation-content" aria-live="polite"></div>
+    </section>
+
+    <section id="page-traces" class="page card" aria-labelledby="traces-title" hidden>
+      <h2 id="traces-title">Traces</h2>
+      <div id="traces-content" aria-live="polite"></div>
+    </section>
+  </main>
+  <script>
+    const API_ORIGIN = "http://127.0.0.1:8000";
+    const API_START_COMMAND =
+      ".\\.venv\\Scripts\\Activate.ps1; python -m uvicorn insightpilot.api:app --host 127.0.0.1 --port 8000";
+    const byId = (id) => document.getElementById(id);
+    const statusBox = byId("backend-status");
+    const examples = [
+      "total revenue by region",
+      "top 3 products by revenue",
+      "monthly revenue trend",
+      "correlation between quantity and revenue",
+      "total refund amount",
+      "how is revenue calculated"
+    ];
+
+    class ApiResponseError extends Error {
+      constructor(message, status) {
+        super(message);
+        this.status = status;
+      }
+    }
+
+    function element(tag, text, className) {
+      const node = document.createElement(tag);
+      if (text !== undefined) node.textContent = String(text);
+      if (className) node.className = className;
+      return node;
+    }
+
+    async function api(path, options) {
+      const requestedUrl = new URL(path, window.location.href).href;
+      if (window.location.origin !== API_ORIGIN) {
+        const error = new Error(`This page is served from ${window.location.origin}; open ${API_ORIGIN}/ instead`);
+        error.requestedUrl = requestedUrl;
+        throw error;
+      }
+      let response;
+      try {
+        response = await fetch(path, options);
+      } catch (cause) {
+        const error = new Error(cause.message);
+        error.requestedUrl = requestedUrl;
+        throw error;
+      }
+      let body = {};
+      try { body = await response.json(); } catch (_) { body = {}; }
+      if (!response.ok) throw new ApiResponseError(body.detail || `Request failed (${response.status})`, response.status);
+      return body;
+    }
+
+    function showRequestFailure(error) {
+      if (error instanceof ApiResponseError) setBackend(true, "Backend online");
+      else setBackend(false, error.message, error.requestedUrl);
+    }
+
+    function setBackend(online, message, requestedUrl = `${API_ORIGIN}/api/health`) {
+      statusBox.textContent = message;
+      statusBox.classList.toggle("offline", !online);
+      if (!online) {
+        statusBox.textContent =
+          `Backend offline: ${message}. API URL: ${requestedUrl}. Start the API with: ${API_START_COMMAND}`;
+      }
+    }
+
+    function makeTable(headers, rows) {
+      const table = document.createElement("table");
+      const head = document.createElement("thead");
+      const headingRow = document.createElement("tr");
+      headers.forEach((value) => headingRow.appendChild(element("th", value)));
+      head.appendChild(headingRow);
+      table.appendChild(head);
+      const body = document.createElement("tbody");
+      rows.forEach((row) => {
+        const tr = document.createElement("tr");
+        row.forEach((value) => tr.appendChild(element("td", value === null ? "—" : value)));
+        body.appendChild(tr);
+      });
+      table.appendChild(body);
+      return table;
+    }
+
+    function addTraceDetails(parent, trace, sql, sources) {
+      if (sql) {
+        const details = document.createElement("details");
+        details.appendChild(element("summary", "SQL"));
+        details.appendChild(element("pre", sql));
+        parent.appendChild(details);
+      }
+      if (sources && sources.length) {
+        const details = document.createElement("details");
+        details.appendChild(element("summary", "Sources"));
+        const list = document.createElement("ul");
+        sources.forEach((source) => {
+          list.appendChild(element("li", `${source.doc} > ${source.heading} (${source.chunk_id})`));
+        });
+        details.appendChild(list);
+        parent.appendChild(details);
+      }
+      if (trace && trace.length) {
+        const details = document.createElement("details");
+        details.appendChild(element("summary", "Step trace"));
+        const rows = trace.map((step) => [
+          step.node, step.status, `${step.ms} ms`, JSON.stringify(step.summary || {})
+        ]);
+        details.appendChild(makeTable(["Step", "Status", "Duration", "Details"], rows));
+        parent.appendChild(details);
+      }
+    }
+
+    function appendAssistant(data) {
+      const bubble = element("article", undefined, "bubble assistant");
+      bubble.setAttribute("aria-label", "InsightPilot answer");
+      bubble.appendChild(element("span", data.verified ? "Numbers verified" : "Numbers not verified",
+        data.verified ? "verified" : "unverified"));
+      bubble.appendChild(element("p", data.answer));
+      bubble.appendChild(element("p",
+        `Route: ${data.route || "unknown"} · Source: ${data.response_source || "unknown"}`,
+        "muted"));
+      addTraceDetails(bubble, data.trace, data.sql, data.sources);
+      byId("chat-list").appendChild(bubble);
+      byId("chat-list").scrollTop = byId("chat-list").scrollHeight;
+    }
+
+    document.querySelectorAll("nav [data-page]").forEach((button) => {
+      button.addEventListener("click", () => {
+        const page = button.dataset.page;
+        document.querySelectorAll("nav [data-page]").forEach((item) => item.removeAttribute("aria-current"));
+        button.setAttribute("aria-current", "page");
+        document.querySelectorAll(".page").forEach((item) => { item.hidden = item.id !== `page-${page}`; });
+        if (page === "evaluation") loadEvaluation();
+        if (page === "traces") loadTraces();
+      });
+    });
+
+    examples.forEach((question) => {
+      const chip = element("button", question, "chip");
+      chip.type = "button";
+      chip.addEventListener("click", () => {
+        byId("question").value = question;
+        byId("question").focus();
+      });
+      byId("examples").appendChild(chip);
+    });
+
+    byId("chat-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const input = byId("question");
+      const question = input.value.trim();
+      if (!question) return;
+      byId("chat-list").appendChild(element("div", question, "bubble user"));
+      byId("chat-list").scrollTop = byId("chat-list").scrollHeight;
+      byId("typing").hidden = false;
+      byId("ask-button").disabled = true;
+      try {
+        const result = await api("/api/ask", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question })
+        });
+        setBackend(true, "Backend online");
+        appendAssistant(result);
+        input.value = "";
+      } catch (error) {
+        showRequestFailure(error);
+      } finally {
+        byId("typing").hidden = true;
+        byId("ask-button").disabled = false;
+      }
+    });
+
+    byId("upload-form").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const file = byId("upload-file").files[0];
+      if (!file) return;
+      byId("upload-button").disabled = true;
+      byId("upload-message").textContent = "Uploading and profiling…";
+      byId("upload-message").className = "muted";
+      byId("data-profile").replaceChildren();
+      byId("data-schema").replaceChildren();
+      try {
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        let binary = "";
+        bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
+        const result = await api("/api/ingest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ filename: file.name, content_base64: btoa(binary) })
+        });
+        const [profile, schema] = await Promise.all([
+          api(`/api/ingest/report/${encodeURIComponent(result.table)}`),
+          api("/api/schema")
+        ]);
+        setBackend(true, "Backend online");
+        byId("upload-message").textContent = `Loaded table: ${result.table}`;
+        const profileSection = document.createElement("section");
+        profileSection.appendChild(element("h3", "Validation profile"));
+        profileSection.appendChild(element("p", `Rows: ${profile.rows}`));
+        profileSection.appendChild(makeTable(
+          ["Column", "Inferred type", "Null %", "Unique", "Repeated values"],
+          profile.columns.map((column) => [
+            column.name, column.inferred_type, column.null_pct, column.unique, column.duplicate_count
+          ])
+        ));
+        if (typeof profile.duplicates_removed === "number") {
+          profileSection.appendChild(element("p", `Duplicate rows removed: ${profile.duplicates_removed}`, "muted"));
+        }
+        byId("data-profile").appendChild(profileSection);
+        const schemaSection = document.createElement("section");
+        schemaSection.appendChild(element("h3", "Database schema"));
+        const columns = schema[result.table] || [];
+        schemaSection.appendChild(makeTable(
+          ["Column", "Database type"], columns.map((column) => [column.name, column.type])
+        ));
+        byId("data-schema").appendChild(schemaSection);
+      } catch (error) {
+        byId("upload-message").textContent = error.message;
+        byId("upload-message").className = "error";
+        showRequestFailure(error);
+      } finally {
+        byId("upload-button").disabled = false;
+      }
+    });
+
+    function addMetrics(container, values) {
+      const grid = element("div", undefined, "metrics");
+      Object.entries(values).forEach(([label, value]) => {
+        if (value && typeof value === "object") return;
+        const card = element("div", undefined, "metric");
+        card.appendChild(element("span", label, "muted"));
+        card.appendChild(element("strong", value));
+        grid.appendChild(card);
+      });
+      container.appendChild(grid);
+    }
+
+    async function loadEvaluation() {
+      const content = byId("evaluation-content");
+      content.replaceChildren(element("p", "Loading evaluation…", "muted"));
+      try {
+        const summary = await api("/api/eval/summary");
+        setBackend(true, "Backend online");
+        content.replaceChildren();
+        const metadata = summary.metadata || {};
+        content.appendChild(element("p",
+          `Run date: ${metadata.run_at || "not recorded"} · Engine: ${metadata.engine || "not recorded"} · ` +
+          `Mode: ${metadata.mode || "not recorded"} · Embedder: ${metadata.embedder || "not recorded"}`));
+        if (summary.agent) {
+          content.appendChild(element("h3", "Agent evaluation"));
+          addMetrics(content, summary.agent);
+        }
+        const reports = summary.retrieval_by_embedder || {
+          [summary.retrieval && summary.retrieval.embedder || "configured embedder"]: summary.retrieval
+        };
+        Object.entries(reports).forEach(([embedder, report]) => {
+          if (!report || !report.modes) return;
+          content.appendChild(element("h3", `Retrieval · ${embedder}`));
+          Object.entries(report.modes).forEach(([mode, metrics]) => {
+            const section = element("section", undefined, "trace-run");
+            section.appendChild(element("h3", mode));
+            addMetrics(section, metrics);
+            content.appendChild(section);
+          });
+        });
+      } catch (error) {
+        content.replaceChildren();
+        if (error.message.includes("No evaluation has been run")) {
+          setBackend(true, "Backend online");
+          content.appendChild(element("p", "No evaluation run exists yet."));
+          content.appendChild(element("p", "Run: python -m insightpilot.eval.run_eval", "muted"));
+        } else {
+          content.appendChild(element("p", error.message, "error"));
+          showRequestFailure(error);
+        }
+      }
+    }
+
+    async function loadTraces() {
+      const content = byId("traces-content");
+      content.replaceChildren(element("p", "Loading traces…", "muted"));
+      try {
+        const response = await api("/api/traces?limit=50");
+        setBackend(true, "Backend online");
+        content.replaceChildren();
+        if (!response.traces.length) {
+          content.appendChild(element("p", "No trace runs are available yet.", "muted"));
+          return;
+        }
+        response.traces.forEach((run) => {
+          const article = element("article", undefined, "trace-run");
+          article.appendChild(element("h3", `Run ${run.id || ""}`));
+          article.appendChild(element("p", run.ts || "Timestamp not recorded", "muted"));
+          article.appendChild(element("p", run.question || "Question text was not recorded"));
+          const timeline = element("ol", undefined, "timeline");
+          (run.trace || []).forEach((step) => {
+            const item = document.createElement("li");
+            item.appendChild(element("strong", `${step.node}: ${step.status}`));
+            item.appendChild(element("div", `${step.ms} ms · ${JSON.stringify(step.summary || {})}`, "muted"));
+            timeline.appendChild(item);
+          });
+          article.appendChild(timeline);
+          content.appendChild(article);
+        });
+      } catch (error) {
+        content.replaceChildren(element("p", error.message, "error"));
+        showRequestFailure(error);
+      }
+    }
+
+    api("/api/health")
+      .then((health) => setBackend(true,
+        `Backend online · Engine: ${health.engine} · Mode: ${health.mode} · Embedder: ${health.embedder}`))
+      .catch(showRequestFailure);
+  </script>
+</body>
+</html>

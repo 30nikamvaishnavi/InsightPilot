@@ -1,0 +1,274 @@
+{
+  "records": [
+    {
+      "Order ID": "O1449",
+      "Return Date": "2025-03-25",
+      "Reason": "Damaged",
+      "Refund Amount": 2318.48
+    },
+    {
+      "Order ID": "O1037",
+      "Return Date": "2025-12-22",
+      "Reason": "Damaged",
+      "Refund Amount": 30702.18
+    },
+    {
+      "Order ID": "O1429",
+      "Return Date": "2026-01-05",
+      "Reason": "Damaged",
+      "Refund Amount": 15698.79
+    },
+    {
+      "Order ID": "O1269",
+      "Return Date": "2025-10-23",
+      "Reason": "Damaged",
+      "Refund Amount": 19057.26
+    },
+    {
+      "Order ID": "O1337",
+      "Return Date": "2025-08-24",
+      "Reason": "Changed mind",
+      "Refund Amount": 2086.48
+    },
+    {
+      "Order ID": "O1232",
+      "Return Date": "2026-01-04",
+      "Reason": "Changed mind",
+      "Refund Amount": 4270.7
+    },
+    {
+      "Order ID": "O1016",
+      "Return Date": "2025-04-06",
+      "Reason": "Changed mind",
+      "Refund Amount": 1580.89
+    },
+    {
+      "Order ID": "O1113",
+      "Return Date": "2025-04-18",
+      "Reason": "Wrong item",
+      "Refund Amount": 32060.55
+    },
+    {
+      "Order ID": "O1274",
+      "Return Date": "2025-11-20",
+      "Reason": "Changed mind",
+      "Refund Amount": 2514.38
+    },
+    {
+      "Order ID": "O1453",
+      "Return Date": "2025-01-18",
+      "Reason": "Wrong item",
+      "Refund Amount": 1883.6
+    },
+    {
+      "Order ID": "O1292",
+      "Return Date": "2025-08-10",
+      "Reason": "Damaged",
+      "Refund Amount": 25246.96
+    },
+    {
+      "Order ID": "O1464",
+      "Return Date": "2026-01-09",
+      "Reason": "Wrong item",
+      "Refund Amount": 20101.85
+    },
+    {
+      "Order ID": "O1440",
+      "Return Date": "2025-11-25",
+      "Reason": "Changed mind",
+      "Refund Amount": 20547.24
+    },
+    {
+      "Order ID": "O1408",
+      "Return Date": "2025-05-26",
+      "Reason": "Damaged",
+      "Refund Amount": 25414.62
+    },
+    {
+      "Order ID": "O1005",
+      "Return Date": "2025-07-20",
+      "Reason": "Wrong item",
+      "Refund Amount": 364901.81
+    },
+    {
+      "Order ID": "O1090",
+      "Return Date": "2025-03-06",
+      "Reason": "Changed mind",
+      "Refund Amount": 1553.87
+    },
+    {
+      "Order ID": "O1158",
+      "Return Date": "2026-01-15",
+      "Reason": "Wrong item",
+      "Refund Amount": 18594.92
+    },
+    {
+      "Order ID": "O1063",
+      "Return Date": "2025-05-03",
+      "Reason": "Damaged",
+      "Refund Amount": 20593.59
+    },
+    {
+      "Order ID": "O1115",
+      "Return Date": "2025-03-11",
+      "Reason": "Damaged",
+      "Refund Amount": 21685.43
+    },
+    {
+      "Order ID": "O1432",
+      "Return Date": "2026-01-03",
+      "Reason": "Damaged",
+      "Refund Amount": 18063.27
+    },
+    {
+      "Order ID": "O1303",
+      "Return Date": "2025-05-20",
+      "Reason": "Damaged",
+      "Refund Amount": 480.89
+    },
+    {
+      "Order ID": "O1236",
+      "Return Date": "2025-07-27",
+      "Reason": "Damaged",
+      "Refund Amount": 3548.54
+    },
+    {
+      "Order ID": "O1167",
+      "Return Date": "2025-10-31",
+      "Reason": "Damaged",
+      "Refund Amount": 6475.1
+    },
+    {
+      "Order ID": "O1002",
+      "Return Date": "2026-01-13",
+      "Reason": "Changed mind",
+      "Refund Amount": 1006.47
+    },
+    {
+      "Order ID": "O1101",
+      "Return Date": "2025-05-16",
+      "Reason": "Wrong item",
+      "Refund Amount": 274975.27
+    },
+    {
+      "Order ID": "O1068",
+      "Return Date": "2025-06-02",
+      "Reason": "Damaged",
+      "Refund Amount": 3255.83
+    },
+    {
+      "Order ID": "O1450",
+      "Return Date": "2025-10-20",
+      "Reason": "Changed mind",
+      "Refund Amount": 3593.62
+    },
+    {
+      "Order ID": "O1053",
+      "Return Date": "2025-07-20",
+      "Reason": "Wrong item",
+      "Refund Amount": 15090.84
+    },
+    {
+      "Order ID": "O1217",
+      "Return Date": "2025-11-17",
+      "Reason": "Wrong item",
+      "Refund Amount": 2234.94
+    },
+    {
+      "Order ID": "O1254",
+      "Return Date": "2025-06-19",
+      "Reason": "Changed mind",
+      "Refund Amount": 46826.7
+    },
+    {
+      "Order ID": "O1048",
+      "Return Date": "2025-09-16",
+      "Reason": "Changed mind",
+      "Refund Amount": 3973.69
+    },
+    {
+      "Order ID": "O1143",
+      "Return Date": "2025-12-04",
+      "Reason": "Damaged",
+      "Refund Amount": 102576.06
+    },
+    {
+      "Order ID": "O1406",
+      "Return Date": "2025-10-25",
+      "Reason": "Damaged",
+      "Refund Amount": 853.13
+    },
+    {
+      "Order ID": "O1194",
+      "Return Date": "2025-07-22",
+      "Reason": "Wrong item",
+      "Refund Amount": 22055.26
+    },
+    {
+      "Order ID": "O1351",
+      "Return Date": "2025-10-05",
+      "Reason": "Damaged",
+      "Refund Amount": 10814.4
+    },
+    {
+      "Order ID": "O1416",
+      "Return Date": "2026-01-02",
+      "Reason": "Changed mind",
+      "Refund Amount": 1353.17
+    },
+    {
+      "Order ID": "O1479",
+      "Return Date": "2025-09-21",
+      "Reason": "Wrong item",
+      "Refund Amount": 23436.7
+    },
+    {
+      "Order ID": "O1473",
+      "Return Date": "2025-02-12",
+      "Reason": "Damaged",
+      "Refund Amount": 285100.83
+    },
+    {
+      "Order ID": "O1436",
+      "Return Date": "2025-12-17",
+      "Reason": "Wrong item",
+      "Refund Amount": 21033.84
+    },
+    {
+      "Order ID": "O1332",
+      "Return Date": "2025-06-10",
+      "Reason": "Wrong item",
+      "Refund Amount": 1390.92
+    },
+    {
+      "Order ID": "O1200",
+      "Return Date": "2025-07-01",
+      "Reason": "Changed mind",
+      "Refund Amount": 351.02
+    },
+    {
+      "Order ID": "O1046",
+      "Return Date": "2025-06-12",
+      "Reason": "Damaged",
+      "Refund Amount": 5664.8
+    },
+    {
+      "Order ID": "O1359",
+      "Return Date": "2026-01-03",
+      "Reason": "Changed mind",
+      "Refund Amount": 34143.03
+    },
+    {
+      "Order ID": "O1299",
+      "Return Date": "2025-12-07",
+      "Reason": "Wrong item",
+      "Refund Amount": 2329.75
+    },
+    {
+      "Order ID": "O1189",
+      "Return Date": "2025-06-30",
+      "Reason": "Damaged",
+      "Refund Amount": 533.16
+    }
+  ]
+}

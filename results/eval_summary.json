@@ -1,0 +1,173 @@
+{
+  "metadata": {
+    "run_at": "2026-10-31T17:35:49+00:00",
+    "engine": "langgraph",
+    "mode": "template",
+    "llm_model": null,
+    "embedder": "lsa-char-ngram"
+  },
+  "agent": {
+    "cases": 21,
+    "route_accuracy": 1.0,
+    "answer_accuracy": 1.0,
+    "verified_rate": 1.0,
+    "avg_latency_ms": 14.37,
+    "by_category": {
+      "aggregate": {
+        "cases": 6,
+        "passed": 6
+      },
+      "group": {
+        "cases": 4,
+        "passed": 4
+      },
+      "multi-source": {
+        "cases": 3,
+        "passed": 3
+      },
+      "statistics": {
+        "cases": 2,
+        "passed": 2
+      },
+      "docs": {
+        "cases": 3,
+        "passed": 3
+      },
+      "safety": {
+        "cases": 3,
+        "passed": 3
+      }
+    },
+    "failed_cases": []
+  },
+  "retrieval": {
+    "n_queries": 103,
+    "embedder": "lsa-char-ngram",
+    "modes": {
+      "hybrid": {
+        "recall@1": 0.6117,
+        "recall@3": 0.8835,
+        "recall@5": 0.9126,
+        "mrr": 0.7382,
+        "queries_with_no_hit_in_top_k": [
+          "How can I independently check the stored line amount against its inputs?",
+          "Which arithmetic relationship should agree with each recorded sale amount?",
+          "What key links a reimbursement to its original transaction?",
+          "Could a question run an update while the database is in analysis mode?",
+          "Does the loader append rows or rebuild the target table?",
+          "Which field should be aggregated to answer how many items moved?",
+          "What limitation should I keep in mind when requesting the leading five products?",
+          "Which attributes are captured for an item coming back?",
+          "Which timestamp starts the customer's return allowance?"
+        ]
+      },
+      "bm25": {
+        "recall@1": 0.5825,
+        "recall@3": 0.8155,
+        "recall@5": 0.8835,
+        "mrr": 0.7037,
+        "queries_with_no_hit_in_top_k": [
+          "what fields are in the returns data",
+          "Which arithmetic relationship should agree with each recorded sale amount?",
+          "What key links a reimbursement to its original transaction?",
+          "Could a question run an update while the database is in analysis mode?",
+          "Does the loader append rows or rebuild the target table?",
+          "How do I teach the importer about a new extension?",
+          "Which field should be aggregated to answer how many items moved?",
+          "Why might the count of sales rows be a bad AOV denominator?",
+          "What limitation should I keep in mind when requesting the leading five products?",
+          "What is the normal time allowance for returning a purchase?",
+          "Which attributes are captured for an item coming back?",
+          "Which timestamp starts the customer's return allowance?"
+        ]
+      },
+      "embedding": {
+        "recall@1": 0.6019,
+        "recall@3": 0.835,
+        "recall@5": 0.8738,
+        "mrr": 0.7126,
+        "queries_with_no_hit_in_top_k": [
+          "which months are in Q3",
+          "Does a repeated order number always mean two copies of the same sale?",
+          "How does the import process decide whether a date column can be normalized?",
+          "How can I independently check the stored line amount against its inputs?",
+          "Which arithmetic relationship should agree with each recorded sale amount?",
+          "What key links a reimbursement to its original transaction?",
+          "Could a question run an update while the database is in analysis mode?",
+          "Does the loader append rows or rebuild the target table?",
+          "If two files have the same stem, where do their records go?",
+          "Which field should be aggregated to answer how many items moved?",
+          "How is the change rate between consecutive periods formed?",
+          "What limitation should I keep in mind when requesting the leading five products?",
+          "Which attributes are captured for an item coming back?"
+        ]
+      }
+    }
+  },
+  "retrieval_by_embedder": {
+    "lsa-char-ngram": {
+      "n_queries": 103,
+      "embedder": "lsa-char-ngram",
+      "modes": {
+        "hybrid": {
+          "recall@1": 0.6117,
+          "recall@3": 0.8835,
+          "recall@5": 0.9126,
+          "mrr": 0.7382,
+          "queries_with_no_hit_in_top_k": [
+            "How can I independently check the stored line amount against its inputs?",
+            "Which arithmetic relationship should agree with each recorded sale amount?",
+            "What key links a reimbursement to its original transaction?",
+            "Could a question run an update while the database is in analysis mode?",
+            "Does the loader append rows or rebuild the target table?",
+            "Which field should be aggregated to answer how many items moved?",
+            "What limitation should I keep in mind when requesting the leading five products?",
+            "Which attributes are captured for an item coming back?",
+            "Which timestamp starts the customer's return allowance?"
+          ]
+        },
+        "bm25": {
+          "recall@1": 0.5825,
+          "recall@3": 0.8155,
+          "recall@5": 0.8835,
+          "mrr": 0.7037,
+          "queries_with_no_hit_in_top_k": [
+            "what fields are in the returns data",
+            "Which arithmetic relationship should agree with each recorded sale amount?",
+            "What key links a reimbursement to its original transaction?",
+            "Could a question run an update while the database is in analysis mode?",
+            "Does the loader append rows or rebuild the target table?",
+            "How do I teach the importer about a new extension?",
+            "Which field should be aggregated to answer how many items moved?",
+            "Why might the count of sales rows be a bad AOV denominator?",
+            "What limitation should I keep in mind when requesting the leading five products?",
+            "What is the normal time allowance for returning a purchase?",
+            "Which attributes are captured for an item coming back?",
+            "Which timestamp starts the customer's return allowance?"
+          ]
+        },
+        "embedding": {
+          "recall@1": 0.6019,
+          "recall@3": 0.835,
+          "recall@5": 0.8738,
+          "mrr": 0.7126,
+          "queries_with_no_hit_in_top_k": [
+            "which months are in Q3",
+            "Does a repeated order number always mean two copies of the same sale?",
+            "How does the import process decide whether a date column can be normalized?",
+            "How can I independently check the stored line amount against its inputs?",
+            "Which arithmetic relationship should agree with each recorded sale amount?",
+            "What key links a reimbursement to its original transaction?",
+            "Could a question run an update while the database is in analysis mode?",
+            "Does the loader append rows or rebuild the target table?",
+            "If two files have the same stem, where do their records go?",
+            "Which field should be aggregated to answer how many items moved?",
+            "How is the change rate between consecutive periods formed?",
+            "What limitation should I keep in mind when requesting the leading five products?",
+            "Which attributes are captured for an item coming back?"
+          ]
+        }
+      }
+    }
+  }
+}

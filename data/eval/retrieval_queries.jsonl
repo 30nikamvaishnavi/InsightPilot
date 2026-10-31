@@ -1,0 +1,103 @@
+{"query": "how is revenue calculated", "expected": ["revenue_definition::revenue-formula"]}
+{"query": "does revenue include shipping or tax", "expected": ["revenue_definition::what-revenue-excludes"]}
+{"query": "when is a sale counted as revenue", "expected": ["revenue_definition::revenue-recognition-timing"]}
+{"query": "are returns subtracted from revenue", "expected": ["revenue_definition::what-revenue-excludes"]}
+{"query": "what is the maximum discount we can give", "expected": ["discount_policy::discount-limits"]}
+{"query": "who needs to approve a 20 percent discount", "expected": ["discount_policy::approval-rules"]}
+{"query": "approval needed for big discounts", "expected": ["discount_policy::approval-rules"]}
+{"query": "festival sale pricing rules", "expected": ["discount_policy::seasonal-promotions"]}
+{"query": "how many days do customers have to return an item", "expected": ["returns_policy::return-window"]}
+{"query": "refund for a damaged product", "expected": ["returns_policy::refund-amounts"]}
+{"query": "what reasons are recorded for returns", "expected": ["returns_policy::return-reasons"]}
+{"query": "which states are in the North region", "expected": ["regions::region-definitions"]}
+{"query": "who manages regional reporting", "expected": ["regions::region-reporting"]}
+{"query": "when does the fiscal year start", "expected": ["fiscal_calendar::fiscal-year"]}
+{"query": "which months are in Q3", "expected": ["fiscal_calendar::quarters"]}
+{"query": "when are the monthly books closed", "expected": ["fiscal_calendar::reporting-cadence"]}
+{"query": "define AOV", "expected": ["kpi_glossary::average-order-value-aov"]}
+{"query": "how do we measure growth versus last month", "expected": ["kpi_glossary::month-over-month-growth"]}
+{"query": "what share of orders get sent back", "expected": ["kpi_glossary::return-rate"]}
+{"query": "what does units sold mean", "expected": ["kpi_glossary::units-sold"]}
+{"query": "which column holds the order date", "expected": ["data_dictionary::sales-table-columns"]}
+{"query": "what fields are in the returns data", "expected": ["data_dictionary::returns-table-columns"]}
+{"query": "where are the planned sales goals stored", "expected": ["data_dictionary::targets-table-columns"]}
+{"query": "what is the range of the discount column", "expected": ["data_dictionary::sales-table-columns", "discount_policy::discount-limits"]}
+{"query": "Which checks help confirm that an imported dataset is sufficiently complete?", "expected": ["data_quality::source-completeness"]}
+{"query": "Before trusting a total, where can I see whether source records are missing?", "expected": ["data_quality::source-completeness"]}
+{"query": "What ingredients does a sales analysis need in order to calculate line value?", "expected": ["data_quality::required-sales-fields"]}
+{"query": "Which sales attributes are indispensable for the usual revenue and region questions?", "expected": ["data_quality::required-sales-fields"]}
+{"query": "Does a repeated order number always mean two copies of the same sale?", "expected": ["data_quality::unique-order-identifiers"]}
+{"query": "Why can counting spreadsheet rows overstate the number of purchases?", "expected": ["data_quality::unique-order-identifiers"]}
+{"query": "How does the import process decide whether a date column can be normalized?", "expected": ["data_quality::date-representation"]}
+{"query": "What representation makes calendar grouping consistent between the supported databases?", "expected": ["data_quality::date-representation"]}
+{"query": "What should an analyst do when a markdown fraction is outside the policy range?", "expected": ["data_quality::valid-discount-values"]}
+{"query": "How can I independently check the stored line amount against its inputs?", "expected": ["data_quality::revenue-reconciliation"]}
+{"query": "Which arithmetic relationship should agree with each recorded sale amount?", "expected": ["data_quality::revenue-reconciliation"]}
+{"query": "How should return entries be joined to sales, and what if an identifier is absent?", "expected": ["data_quality::return-matching"]}
+{"query": "What key links a reimbursement to its original transaction?", "expected": ["data_quality::return-matching"]}
+{"query": "How do I tell whether every territory has a target for every reporting quarter?", "expected": ["data_quality::target-coverage"]}
+{"query": "What does a missing territory-period target imply for a comparison?", "expected": ["data_quality::target-coverage"]}
+{"query": "Can grouped totals be considered exhaustive when some category labels are blank?", "expected": ["data_quality::missing-categories"]}
+{"query": "Why might the sum of named categories omit some records?", "expected": ["data_quality::missing-categories"]}
+{"query": "What is the difference between repeated column values and duplicate records?", "expected": ["data_quality::duplicate-records"]}
+{"query": "How does ingestion handle identical rows, and what does a per-field repetition mean?", "expected": ["data_quality::duplicate-records"]}
+{"query": "Which steps should a read-only analyst connection enforce in PostgreSQL?", "expected": ["operations_reference::access-boundaries"]}
+{"query": "Could a question run an update while the database is in analysis mode?", "expected": ["operations_reference::access-boundaries"]}
+{"query": "What happens to an existing destination when I load a file again?", "expected": ["operations_reference::batch-imports"]}
+{"query": "Does the loader append rows or rebuild the target table?", "expected": ["operations_reference::batch-imports"]}
+{"query": "What data types can the browser send to the upload endpoint?", "expected": ["operations_reference::browser-uploads"]}
+{"query": "Can a pipe-separated text extract be uploaded for profiling?", "expected": ["operations_reference::browser-uploads"]}
+{"query": "How do I teach the importer about a new extension?", "expected": ["operations_reference::unsupported-file-formats"]}
+{"query": "What happens if I submit a file the application has no parser for?", "expected": ["operations_reference::unsupported-file-formats"]}
+{"query": "How is the SQL table name selected from an uploaded workbook?", "expected": ["operations_reference::table-naming"]}
+{"query": "If two files have the same stem, where do their records go?", "expected": ["operations_reference::table-naming"]}
+{"query": "What details appear in the data validation output?", "expected": ["operations_reference::validation-reports"]}
+{"query": "Does a profile prove that business values are accurate?", "expected": ["operations_reference::validation-reports"]}
+{"query": "What safeguards constrain a generated analytical statement?", "expected": ["operations_reference::sql-query-limits"]}
+{"query": "Are query limits a substitute for checking whether the requested metric makes sense?", "expected": ["operations_reference::sql-query-limits"]}
+{"query": "Where are per-run JSON event records stored by default?", "expected": ["operations_reference::local-trace-files"]}
+{"query": "Could local diagnostic history contain what a user typed?", "expected": ["operations_reference::local-trace-files"]}
+{"query": "Which setting turns on OTLP spans, and when can input text enter span metadata?", "expected": ["operations_reference::optional-telemetry"]}
+{"query": "Will the telemetry exporter disclose question wording by default?", "expected": ["operations_reference::optional-telemetry"]}
+{"query": "What should someone do in the browser if the API cannot be reached?", "expected": ["operations_reference::service-recovery"]}
+{"query": "Does the interface invent an answer while the service is down?", "expected": ["operations_reference::service-recovery"]}
+{"query": "What does the headline revenue total include?", "expected": ["analysis_playbook::gross-revenue"]}
+{"query": "Are shipping, tax and returned money already netted out of the stored sales metric?", "expected": ["analysis_playbook::gross-revenue"]}
+{"query": "How can a team calculate sales remaining after reimbursements?", "expected": ["analysis_playbook::net-sales"]}
+{"query": "What precautions prevent refund amounts being deducted repeatedly?", "expected": ["analysis_playbook::net-sales"]}
+{"query": "Do units mean the number of lines or the sum of the quantities?", "expected": ["analysis_playbook::units-sold"]}
+{"query": "Which field should be aggregated to answer how many items moved?", "expected": ["analysis_playbook::units-sold"]}
+{"query": "How should average value per purchase be calculated from line-level data?", "expected": ["analysis_playbook::average-order-value"]}
+{"query": "Why might the count of sales rows be a bad AOV denominator?", "expected": ["analysis_playbook::average-order-value"]}
+{"query": "How is the change rate between consecutive periods formed?", "expected": ["analysis_playbook::period-growth"]}
+{"query": "What happens to percentage growth if the baseline is zero?", "expected": ["analysis_playbook::period-growth"]}
+{"query": "What should be checked before comparing totals across territories?", "expected": ["analysis_playbook::group-comparisons"]}
+{"query": "Can a chart of present groups prove no category was omitted?", "expected": ["analysis_playbook::group-comparisons"]}
+{"query": "How does the analyst decide which records are top ranked?", "expected": ["analysis_playbook::top-and-bottom-rows"]}
+{"query": "What limitation should I keep in mind when requesting the leading five products?", "expected": ["analysis_playbook::top-and-bottom-rows"]}
+{"query": "Does an association score prove that a promotion caused a sales increase?", "expected": ["analysis_playbook::correlation"]}
+{"query": "What can Pearson's coefficient tell me, and what can it not establish?", "expected": ["analysis_playbook::correlation"]}
+{"query": "Why might adjacent reported periods skip a month?", "expected": ["analysis_playbook::trend-interpretation"]}
+{"query": "What does a time series omit when the source has no observations for a period?", "expected": ["analysis_playbook::trend-interpretation"]}
+{"query": "What should the assistant do when a requested measure is ambiguous?", "expected": ["analysis_playbook::uncertainty-and-clarification"]}
+{"query": "Will the system guess a business metric if the request does not define one?", "expected": ["analysis_playbook::uncertainty-and-clarification"]}
+{"query": "What is the normal time allowance for returning a purchase?", "expected": ["support_workflows::return-eligibility"]}
+{"query": "Which exception applies when an item arrives broken?", "expected": ["support_workflows::return-eligibility"]}
+{"query": "What reimbursement applies to merchandise that arrived damaged?", "expected": ["support_workflows::damaged-item-refunds"]}
+{"query": "How should a broken-product return be categorized in the records?", "expected": ["support_workflows::damaged-item-refunds"]}
+{"query": "What should be paid back when the wrong product was shipped?", "expected": ["support_workflows::wrong-item-refunds"]}
+{"query": "How can a mis-shipped item's repayment be tied to the original sale?", "expected": ["support_workflows::wrong-item-refunds"]}
+{"query": "What portion is retained when a buyer simply changes their mind?", "expected": ["support_workflows::changed-mind-refunds"]}
+{"query": "Is the restocking charge recorded as its own sample-data field?", "expected": ["support_workflows::changed-mind-refunds"]}
+{"query": "Which attributes are captured for an item coming back?", "expected": ["support_workflows::return-authorization-details"]}
+{"query": "Can the example records show whether a return received formal authorization?", "expected": ["support_workflows::return-authorization-details"]}
+{"query": "Which timestamp starts the customer's return allowance?", "expected": ["support_workflows::order-date-and-return-date"]}
+{"query": "Does the recorded date of receipt mean the day the customer ordered?", "expected": ["support_workflows::order-date-and-return-date"]}
+{"query": "Who must provide written sign-off before unusually deep price reductions?", "expected": ["support_workflows::discount-approval"]}
+{"query": "Is approval evidence available as a field in the sample transactions?", "expected": ["support_workflows::discount-approval"]}
+{"query": "Who can authorize a temporary campaign exception to the usual markdown ceiling?", "expected": ["support_workflows::temporary-promotions"]}
+{"query": "Where are the dates and limits for a one-off sale promotion documented?", "expected": ["support_workflows::temporary-promotions"]}
+{"query": "Who owns a territory's quarterly plan and monthly review?", "expected": ["support_workflows::regional-ownership"]}
+{"query": "To whom do local sales leads report?", "expected": ["support_workflows::regional-ownership"]}
+{"query": "How should I respond when policy depends on a fact absent from the uploaded table?", "expected": ["support_workflows::escalating-data-questions"]}
+{"query": "Should the analyst infer an operational outcome when the dataset lacks that detail?", "expected": ["support_workflows::escalating-data-questions"]}

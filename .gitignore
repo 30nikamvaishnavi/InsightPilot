@@ -1,0 +1,10 @@
+__pycache__/
+*.pyc
+.venv/
+.env
+data/insightpilot.db
+data/embedding-cache/
+data/uploads/
+traces/
+.pytest_cache/
+.ruff_cache/
