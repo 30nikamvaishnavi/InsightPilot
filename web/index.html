@@ -30,8 +30,10 @@
     header { display: flex; justify-content: space-between; align-items: flex-start; gap: 16px; }
     h1 { font-size: 1.55rem; margin: 0; letter-spacing: -.03em; }
     .subtitle { margin: 4px 0 0; color: var(--muted); }
-    .status { margin: 18px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); }
+    .status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 18px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); }
     .status.offline { border-color: var(--bad); color: var(--bad); }
+    #backend-message { flex: 1 1 14rem; overflow-wrap: anywhere; }
+    #retry-backend[hidden] { display: none; }
     nav { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 12px; }
     nav button, .secondary, .chip {
       border: 1px solid var(--line); background: var(--surface); color: var(--text);
@@ -91,7 +93,10 @@
         <p class="subtitle">A data analyst that computes with SQL and code, then verifies its answer.</p>
       </div>
     </header>
-    <div id="backend-status" class="status" role="status" aria-live="polite">Checking backend…</div>
+    <div id="backend-status" class="status" role="status" aria-live="polite">
+      <span id="backend-message">Checking backend…</span>
+      <button id="retry-backend" class="secondary" type="button" hidden>Retry</button>
+    </div>
     <nav aria-label="Main navigation">
       <button type="button" data-page="chat" aria-current="page">Chat</button>
       <button type="button" data-page="data">Data</button>
@@ -114,6 +119,7 @@
     <section id="page-data" class="page card" aria-labelledby="data-title" hidden>
       <h2 id="data-title">Data</h2>
       <p class="muted">Upload a CSV, JSON, or Excel file to add a table and inspect its validation profile.</p>
+      <p id="public-demo-notice" class="muted" hidden>Uploads are disabled in the public demo</p>
       <form id="upload-form" class="form-stack">
         <label for="upload-file">Choose a data file</label>
         <input id="upload-file" type="file" accept=".csv,.json,.jsonl,.xlsx,.tsv" required>
@@ -135,11 +141,20 @@
     </section>
   </main>
   <script>
-    const API_ORIGIN = "http://127.0.0.1:8000";
-    const API_START_COMMAND =
-      ".\\.venv\\Scripts\\Activate.ps1; python -m uvicorn insightpilot.api:app --host 127.0.0.1 --port 8000";
+    const pageUrl = new URL(window.location.href);
+    const isHttpOrigin = pageUrl.protocol === "http:" || pageUrl.protocol === "https:";
+    const isLoopbackOrigin = pageUrl.protocol === "http:" && pageUrl.hostname === "127.0.0.1";
+    const isFastApiOrigin = pageUrl.protocol === "https:" || (isLoopbackOrigin && pageUrl.port !== "5500");
+    const API_ORIGIN = isFastApiOrigin ? pageUrl.origin : "http://127.0.0.1:8000";
+    const API_START_COMMAND = ".\\scripts\\run_api.ps1";
+    const HEALTH_POLL_INTERVAL_MS = 5000;
     const byId = (id) => document.getElementById(id);
     const statusBox = byId("backend-status");
+    const statusMessage = byId("backend-message");
+    const retryButton = byId("retry-backend");
+    let backendOnline = false;
+    let healthPollTimer = null;
+    let healthCheckInFlight = false;
     const examples = [
       "total revenue by region",
       "top 3 products by revenue",
@@ -165,7 +180,7 @@
 
     async function api(path, options) {
       const requestedUrl = new URL(path, window.location.href).href;
-      if (window.location.origin !== API_ORIGIN) {
+      if (!isHttpOrigin || !isFastApiOrigin || window.location.origin !== API_ORIGIN) {
         const error = new Error(`This page is served from ${window.location.origin}; open ${API_ORIGIN}/ instead`);
         error.requestedUrl = requestedUrl;
         throw error;
@@ -190,11 +205,61 @@
     }
 
     function setBackend(online, message, requestedUrl = `${API_ORIGIN}/api/health`) {
-      statusBox.textContent = message;
+      backendOnline = online;
+      statusMessage.textContent = message;
       statusBox.classList.toggle("offline", !online);
+      retryButton.hidden = online;
       if (!online) {
-        statusBox.textContent =
-          `Backend offline: ${message}. API URL: ${requestedUrl}. Start the API with: ${API_START_COMMAND}`;
+        statusMessage.textContent =
+          `Backend offline: Waking up the server, this can take up to a minute. ${message}. ` +
+          `API URL: ${requestedUrl}. Start the API with: ${API_START_COMMAND}`;
+      }
+      startHealthPolling();
+    }
+
+    function startHealthPolling() {
+      if (healthPollTimer !== null || document.hidden || window.location.origin !== API_ORIGIN) return;
+      healthPollTimer = window.setInterval(() => {
+        void checkBackend();
+      }, HEALTH_POLL_INTERVAL_MS);
+    }
+
+    function stopHealthPolling() {
+      if (healthPollTimer === null) return;
+      window.clearInterval(healthPollTimer);
+      healthPollTimer = null;
+    }
+
+    async function refreshBackendData() {
+      await loadDataSchema();
+      const activePage = document.querySelector(".page:not([hidden])");
+      if (activePage && activePage.id === "page-evaluation") await loadEvaluation();
+      if (activePage && activePage.id === "page-traces") await loadTraces();
+    }
+
+    async function checkBackend() {
+      if (document.hidden || healthCheckInFlight) return;
+      healthCheckInFlight = true;
+      retryButton.disabled = true;
+      try {
+        const health = await api("/api/health");
+        if (health.status !== "ok") {
+          const error = new Error(`The server at ${API_ORIGIN} is not the InsightPilot API`);
+          error.requestedUrl = `${API_ORIGIN}/api/health`;
+          throw error;
+        }
+        const wasOffline = !backendOnline;
+        const publicDemo = health.public_demo === true;
+        byId("public-demo-notice").hidden = !publicDemo;
+        byId("upload-form").hidden = publicDemo;
+        setBackend(true, "Backend online");
+        if (wasOffline) await refreshBackendData();
+      } catch (error) {
+        setBackend(false, error.message, error.requestedUrl || `${API_ORIGIN}/api/health`);
+      } finally {
+        healthCheckInFlight = false;
+        retryButton.disabled = false;
+        startHealthPolling();
       }
     }
 
@@ -263,9 +328,22 @@
         document.querySelectorAll("nav [data-page]").forEach((item) => item.removeAttribute("aria-current"));
         button.setAttribute("aria-current", "page");
         document.querySelectorAll(".page").forEach((item) => { item.hidden = item.id !== `page-${page}`; });
+        if (page === "data") loadDataSchema();
         if (page === "evaluation") loadEvaluation();
         if (page === "traces") loadTraces();
       });
+    });
+
+    retryButton.addEventListener("click", () => {
+      void checkBackend();
+    });
+
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) {
+        stopHealthPolling();
+      } else if (!backendOnline) {
+        void checkBackend();
+      }
     });
 
     examples.forEach((question) => {
@@ -341,13 +419,7 @@
           profileSection.appendChild(element("p", `Duplicate rows removed: ${profile.duplicates_removed}`, "muted"));
         }
         byId("data-profile").appendChild(profileSection);
-        const schemaSection = document.createElement("section");
-        schemaSection.appendChild(element("h3", "Database schema"));
-        const columns = schema[result.table] || [];
-        schemaSection.appendChild(makeTable(
-          ["Column", "Database type"], columns.map((column) => [column.name, column.type])
-        ));
-        byId("data-schema").appendChild(schemaSection);
+        renderSchema(schema, [result.table]);
       } catch (error) {
         byId("upload-message").textContent = error.message;
         byId("upload-message").className = "error";
@@ -356,6 +428,31 @@
         byId("upload-button").disabled = false;
       }
     });
+
+    function renderSchema(schema, tableNames = Object.keys(schema)) {
+      const container = byId("data-schema");
+      container.replaceChildren();
+      const schemaSection = document.createElement("section");
+      schemaSection.appendChild(element("h3", "Database schema"));
+      tableNames.forEach((tableName) => {
+        const columns = schema[tableName] || [];
+        schemaSection.appendChild(element("h3", tableName));
+        schemaSection.appendChild(makeTable(
+          ["Column", "Database type"], columns.map((column) => [column.name, column.type])
+        ));
+      });
+      if (tableNames.length === 0) schemaSection.appendChild(element("p", "No tables are available.", "muted"));
+      container.appendChild(schemaSection);
+    }
+
+    async function loadDataSchema() {
+      try {
+        renderSchema(await api("/api/schema"));
+      } catch (error) {
+        byId("data-schema").replaceChildren(element("p", error.message, "error"));
+        showRequestFailure(error);
+      }
+    }
 
     function addMetrics(container, values) {
       const grid = element("div", undefined, "metrics");
@@ -442,10 +539,7 @@
       }
     }
 
-    api("/api/health")
-      .then((health) => setBackend(true,
-        `Backend online · Engine: ${health.engine} · Mode: ${health.mode} · Embedder: ${health.embedder}`))
-      .catch(showRequestFailure);
+    void checkBackend();
   </script>
 </body>
 </html>

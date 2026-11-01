@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: insightpilot-demo
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    envVars:
+      - key: PUBLIC_DEMO
+        value: "1"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "30"

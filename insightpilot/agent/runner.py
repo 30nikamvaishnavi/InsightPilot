@@ -1,6 +1,7 @@
 """The public Agent: runs the graph, shapes the response and writes the trace."""
 from __future__ import annotations
 
+import os
 import time
 import uuid
 from datetime import datetime, timezone
@@ -64,5 +65,11 @@ class Agent:
             "latency_ms": round((time.perf_counter() - started) * 1000, 2),
         }
         if self.write_traces:
-            write_trace(self.settings.trace_dir, {**output, "ts": datetime.now(timezone.utc).isoformat()})
+            trace_record = {**output, "ts": datetime.now(timezone.utc).isoformat()}
+            if (
+                os.environ.get("PUBLIC_DEMO", "").strip() == "1"
+                and os.environ.get("PUBLIC_DEMO_TRACE_QUESTIONS", "").strip() != "1"
+            ):
+                trace_record.pop("question", None)
+            write_trace(self.settings.trace_dir, trace_record)
         return output

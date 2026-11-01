@@ -45,11 +45,28 @@ The ingestion report includes inferred types, null percentages, repeated-value c
 
 ## Run the API and web UI
 
+Windows PowerShell:
+
 ```powershell
-uvicorn insightpilot.api:app --reload
+.\scripts\run_api.ps1
 ```
 
-Open `http://localhost:8000` for Chat, Data, Evaluation, and Traces. API documentation is at `http://localhost:8000/docs`. If the service is unreachable, the UI explicitly reports that the backend is offline; it does not fabricate answers or metrics.
+macOS/Linux (from the project root):
+
+```bash
+source .venv/bin/activate && python -m uvicorn insightpilot.api:app --host 127.0.0.1 --port 8000
+```
+
+Open `http://127.0.0.1:8000/` for Chat, Data, Evaluation, and Traces. API documentation is at `http://127.0.0.1:8000/docs`. If the service is unreachable, the UI shows the URL it tried and the start command, offers Retry, and checks health periodically while the page is visible.
+
+## Troubleshooting
+
+- Start the API from the project root with `.\scripts\run_api.ps1` in Windows PowerShell, or with the macOS/Linux one-liner above. The PowerShell script activates `.venv` when it exists and starts Uvicorn on `127.0.0.1:8000`.
+- For local development, open the UI at `http://127.0.0.1:8000/`. Do not open `web/index.html` directly with `file://` or from Live Server (for example port 5500): API requests are served by FastAPI and the UI directs those origins back to this URL. A deployed HTTPS instance serves its UI and API from the same origin.
+- Check that the backend is reachable at `http://127.0.0.1:8000/api/health`; a healthy API returns JSON with `"status": "ok"`.
+- On Windows, check whether another process is using port 8000 with `netstat -ano | findstr :8000`. The PID in the `LISTENING` row identifies the process.
+- Inspect that PID before stopping anything: `Get-CimInstance Win32_Process -Filter "ProcessId=<PID>" | Select ProcessId, Name, CommandLine`. Only stop it if the command line identifies this project's `insightpilot.api:app`; then use `Stop-Process -Id <PID>`. The launcher prompts before stopping a detected project server and never stops another program. To use a different port, run `.\scripts\run_api.ps1 -Port 8001` and open the URL it prints.
+- If the page reports that the backend is offline, use Retry or start the API. While the tab is visible, the UI checks health every 5 seconds and refreshes schema and the active Evaluation or Traces view after reconnection.
 
 ## Docker
 
@@ -75,6 +92,18 @@ python -m insightpilot.cli ask "monthly revenue trend"
 ```
 
 PostgreSQL analytical queries run in a read-only transaction and receive a statement timeout and the same result row cap. Ingestion uses the configured database connection to write the destination table. The PostgreSQL image in the override includes pgvector for vector retrieval.
+
+## Deploy a public demo on Render
+
+The repository includes `render.yaml` and a Dockerfile for a free Render web service:
+
+1. Push the repository to GitHub and create a new Render Blueprint from it.
+2. Review the `insightpilot-demo` web service and deploy the Blueprint. It sets `PUBLIC_DEMO=1`; Render supplies `PORT`.
+3. Open the HTTPS URL Render provides. The app serves its UI and API from that same origin.
+
+The public demo disables uploads and trace listing. Ask and search remain available with an in-memory per-IP limit set by `RATE_LIMIT_PER_MINUTE` (default `30` requests per minute, independently for each endpoint). When present, only the first address in `X-Forwarded-For` is used. This limiter and its counters are process-local and are intended only for a single-instance demo, not as production abuse protection.
+
+Render's free web service sleeps after 15 minutes idle and may take about a minute to wake. Its filesystem is not persistent: SQLite is re-created from the sample data when the service starts, and uploaded data should not be expected to persist. This is a demo using fictional sample data, not a production service. Public-demo traces omit question text by default; `PUBLIC_DEMO_TRACE_QUESTIONS=1` explicitly opts back in.
 
 ## Optional sentence-transformer embeddings
 
@@ -123,6 +152,7 @@ The command writes `results/eval_summary.json` and `results/agent_cases.csv`. Re
 - The included data is synthetic and small. Benchmark results measure this labelled corpus and query set, not general retrieval quality.
 - PostgreSQL/pgvector, sentence-transformers, and OTLP export require their optional dependencies and services. They are not required for the default offline workflow.
 - Verification status: PostgreSQL, pgvector, sentence-transformers, and OTLP export are implemented and unit-tested with mocks; not verified against a live service. Docker and a live PostgreSQL server were unavailable during this audit.
+- The public-demo rate limiter is process-local and uses the first `X-Forwarded-For` address; use only for the configured single-instance demonstration.
 - LLM explanations require an external API and send the question and bounded result context to that provider. Do not send sensitive data unless your policies permit it.
 
 Regenerate the synthetic example files with `python scripts/make_sample_data.py`.

@@ -1,5 +1,8 @@
 import base64
+import os
 import unittest
+import uuid
+from unittest.mock import patch
 
 try:
     from fastapi.testclient import TestClient
@@ -19,9 +22,14 @@ class ApiTests(unittest.TestCase):
         cls.client = TestClient(api.app)
 
     def test_health(self):
-        body = self.client.get("/api/health").json()
+        response = self.client.get("/api/health")
+        body = response.json()
         self.assertEqual(body["status"], "ok")
         self.assertIn("sales", body["tables"])
+        self.assertIn("public_demo", body)
+        self.assertEqual(response.headers["x-content-type-options"], "nosniff")
+        self.assertEqual(response.headers["referrer-policy"], "strict-origin-when-cross-origin")
+        self.assertIn("default-src 'self'", response.headers["content-security-policy"])
 
     def test_ask(self):
         body = self.client.post("/api/ask", json={"question": "total revenue by region"}).json()
@@ -82,6 +90,62 @@ class ApiTests(unittest.TestCase):
             self.assertEqual(self.client.get("/api/eval/summary").status_code, 404)
         finally:
             api._state["analyst"].settings = original
+
+    def test_public_demo_disables_ingest_and_traces_but_keeps_ask_and_search(self):
+        content = base64.b64encode(b"a,b\n1,2\n").decode()
+        with patch.dict(os.environ, {"PUBLIC_DEMO": "1"}):
+            self.assertTrue(self.client.get("/api/health").json()["public_demo"])
+            self.assertEqual(
+                self.client.post(
+                    "/api/ingest", json={"filename": "sample.csv", "content_base64": content}
+                ).status_code,
+                403,
+            )
+            self.assertEqual(self.client.get("/api/traces").status_code, 403)
+            ip = f"demo-availability-{uuid.uuid4()}"
+            ask_response = self.client.post(
+                "/api/ask",
+                json={"question": "total revenue by region"},
+                headers={"X-Forwarded-For": ip},
+            )
+            self.assertEqual(ask_response.status_code, 200)
+            search_response = self.client.get(
+                "/api/search",
+                params={"q": "refund policy"},
+                headers={"X-Forwarded-For": ip},
+            )
+            self.assertEqual(search_response.status_code, 200)
+
+    def test_rate_limit_returns_429_for_ask_and_search_using_first_forwarded_ip(self):
+        from insightpilot import api
+
+        with patch.object(api, "RATE_LIMIT_PER_MINUTE", 1):
+            ask_ip = f"ask-rate-{uuid.uuid4()}"
+            first_ask = self.client.post(
+                "/api/ask",
+                json={"question": "total revenue"},
+                headers={"X-Forwarded-For": f"{ask_ip}, proxy-a"},
+            )
+            second_ask = self.client.post(
+                "/api/ask",
+                json={"question": "total revenue"},
+                headers={"X-Forwarded-For": f"{ask_ip}, proxy-b"},
+            )
+            self.assertEqual(first_ask.status_code, 200)
+            self.assertEqual(second_ask.status_code, 429)
+            self.assertIn("Rate limit exceeded", second_ask.json()["detail"])
+
+            search_ip = f"search-rate-{uuid.uuid4()}"
+            first_search = self.client.get(
+                "/api/search", params={"q": "refund"},
+                headers={"X-Forwarded-For": f"{search_ip}, proxy-a"},
+            )
+            second_search = self.client.get(
+                "/api/search", params={"q": "refund"},
+                headers={"X-Forwarded-For": f"{search_ip}, proxy-b"},
+            )
+            self.assertEqual(first_search.status_code, 200)
+            self.assertEqual(second_search.status_code, 429)
 
 
 if __name__ == "__main__":

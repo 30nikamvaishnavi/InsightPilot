@@ -219,6 +219,28 @@ class LimitsAndTraceTests(unittest.TestCase):
         record = json.loads(files[0].read_text().splitlines()[-1])
         self.assertEqual(record["question"], "total revenue")
 
+    def test_public_demo_trace_omits_question_text_by_default(self):
+        import json
+        import os
+        from unittest.mock import patch
+
+        from insightpilot.config import ROOT
+        from insightpilot.ingestion import ingest_directory
+
+        settings = make_settings()
+        ingest_directory(ROOT / "data" / "sample", settings.db_path)
+        retriever = HybridRetriever(load_chunks(settings.docs_dir))
+        question = "private-demo-question-marker-7d93"
+        agent = Agent(settings, retriever, explainer=None, use_langgraph=False, write_traces=True)
+        with patch.dict(os.environ, {"PUBLIC_DEMO": "1"}, clear=False):
+            os.environ.pop("PUBLIC_DEMO_TRACE_QUESTIONS", None)
+            agent.ask(question)
+        trace_file = next(settings.trace_dir.glob("traces-*.jsonl"))
+        raw_record = trace_file.read_text(encoding="utf-8")
+        record = json.loads(raw_record.splitlines()[-1])
+        self.assertNotIn("question", record)
+        self.assertNotIn(question, raw_record)
+
 
 if __name__ == "__main__":
     unittest.main()
