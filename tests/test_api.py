@@ -31,6 +31,11 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(response.headers["referrer-policy"], "strict-origin-when-cross-origin")
         self.assertIn("default-src 'self'", response.headers["content-security-policy"])
 
+    def test_public_demo_is_off_by_default(self):
+        with patch.dict(os.environ, {}, clear=False):
+            os.environ.pop("PUBLIC_DEMO", None)
+            self.assertFalse(self.client.get("/api/health").json()["public_demo"])
+
     def test_ask(self):
         body = self.client.post("/api/ask", json={"question": "total revenue by region"}).json()
         self.assertTrue(body["verified"])

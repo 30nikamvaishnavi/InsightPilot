@@ -103,7 +103,15 @@ The repository includes `render.yaml` and a Dockerfile for a free Render web ser
 
 The public demo disables uploads and trace listing. Ask and search remain available with an in-memory per-IP limit set by `RATE_LIMIT_PER_MINUTE` (default `30` requests per minute, independently for each endpoint). When present, only the first address in `X-Forwarded-For` is used. This limiter and its counters are process-local and are intended only for a single-instance demo, not as production abuse protection.
 
-Render's free web service sleeps after 15 minutes idle and may take about a minute to wake. Its filesystem is not persistent: SQLite is re-created from the sample data when the service starts, and uploaded data should not be expected to persist. This is a demo using fictional sample data, not a production service. Public-demo traces omit question text by default; `PUBLIC_DEMO_TRACE_QUESTIONS=1` explicitly opts back in.
+Render's free web service sleeps after 15 minutes idle and may take about a minute to wake. It has 512 MB RAM, and its filesystem is not persistent: SQLite is re-created from the sample data when the service starts, and uploaded data should not be expected to persist. The app serves fictional sample data; this is a demo, not a production service. Public-demo traces omit question text by default; `PUBLIC_DEMO_TRACE_QUESTIONS=1` explicitly opts back in.
+
+Check the deployed service (the health check retries for up to 90 seconds on a cold start):
+
+```powershell
+python scripts/check_live.py https://your-render-service.onrender.com
+```
+
+Add `--skip-rate-limit` to omit the 31-request rate-limit check.
 
 ## Optional sentence-transformer embeddings
 

@@ -30,6 +30,7 @@ class WebUiTests(unittest.TestCase):
         self.assertIn("Waking up the server, this can take up to a minute.", page)
         self.assertIn('id="public-demo-notice"', page)
         self.assertIn("Uploads are disabled in the public demo", page)
+        self.assertIn(".form-stack[hidden] { display: none; }", page)
         self.assertIn("health.public_demo === true", page)
         self.assertIn(
             'const API_START_COMMAND = ".\\\\scripts\\\\run_api.ps1"', page
@@ -63,8 +64,14 @@ class WebUiTests(unittest.TestCase):
         self.assertIn("HEALTHCHECK", dockerfile)
         self.assertIn("-r requirements.txt", dockerfile)
         self.assertIn(".env", dockerignore)
+        for excluded in (".venv", ".git", "traces", "data/uploads", "data/insightpilot.db",
+                         "data/embedding-cache", "__pycache__"):
+            self.assertIn(excluded, dockerignore)
+        self.assertNotIn("results", dockerignore)
         self.assertIn("runtime: docker", render)
         self.assertIn("healthCheckPath: /api/health", render)
+        self.assertIn("dockerfilePath: ./Dockerfile", render)
+        self.assertIn("dockerContext: .", render)
         self.assertIn('value: "1"', render)
 
 

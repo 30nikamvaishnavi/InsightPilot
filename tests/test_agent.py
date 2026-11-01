@@ -241,6 +241,25 @@ class LimitsAndTraceTests(unittest.TestCase):
         self.assertNotIn("question", record)
         self.assertNotIn(question, raw_record)
 
+    def test_public_demo_trace_can_include_question_when_explicitly_enabled(self):
+        import json
+        import os
+        from unittest.mock import patch
+
+        from insightpilot.config import ROOT
+        from insightpilot.ingestion import ingest_directory
+
+        settings = make_settings()
+        ingest_directory(ROOT / "data" / "sample", settings.db_path)
+        retriever = HybridRetriever(load_chunks(settings.docs_dir))
+        question = "explicitly-enabled-demo-question"
+        agent = Agent(settings, retriever, explainer=None, use_langgraph=False, write_traces=True)
+        with patch.dict(os.environ, {"PUBLIC_DEMO": "1", "PUBLIC_DEMO_TRACE_QUESTIONS": "1"}, clear=False):
+            agent.ask(question)
+        trace_file = next(settings.trace_dir.glob("traces-*.jsonl"))
+        record = json.loads(trace_file.read_text(encoding="utf-8").splitlines()[-1])
+        self.assertEqual(record["question"], question)
+
 
 if __name__ == "__main__":
     unittest.main()

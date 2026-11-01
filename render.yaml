@@ -3,6 +3,8 @@ services:
     name: insightpilot-demo
     runtime: docker
     plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
     healthCheckPath: /api/health
     envVars:
       - key: PUBLIC_DEMO
